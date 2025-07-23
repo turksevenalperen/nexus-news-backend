@@ -1,3 +1,5 @@
+// Categories Collection - Haber kategorileri veri modeli
+
 import { CollectionConfig } from 'payload'
 
 const Categories: CollectionConfig = {
