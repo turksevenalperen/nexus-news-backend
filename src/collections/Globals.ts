@@ -1,3 +1,4 @@
+// SiteSettings Global - Site genel ayarları
 
 import { GlobalConfig } from 'payload'
 
