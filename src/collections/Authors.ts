@@ -1,3 +1,6 @@
+
+// Authors Collection - Yazar bilgileri veri modeli
+
 import { CollectionConfig } from 'payload'
 
 const Authors: CollectionConfig = {
