@@ -9,6 +9,11 @@ import sharp from 'sharp'
 
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
+// Collection'ımızı import ediyoruz
+import Posts from './collections/Posts'
+import Categories from './collections/Categories'
+import Authors from './collections/Authors'
+import SiteSettings from './collections/Globals' 
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -20,15 +25,51 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Media],
+  
+  // Collection'ları buraya ekliyoruz
+  collections: [
+    Users, 
+    Media, 
+    {
+      ...Posts,
+      access: {
+        read: () => true, // Public read access
+      }
+    },
+    {
+      ...Categories,
+      access: {
+        read: () => true, // Public read access
+      }
+    },
+    {
+      ...Authors,
+      access: {
+        read: () => true, // Public read access
+      }
+    }
+  ],
+  globals: [
+    {
+      ...SiteSettings,
+      access: {
+        read: () => true, // Public read access
+      }
+    }
+  ],
+  
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
+  
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
+  
+  // MongoDB bağlantısı
   db: mongooseAdapter({
-    url: process.env.DATABASE_URI || '',
+    url: process.env.DATABASE_URI || '', // Senin env adın
   }),
+  
   sharp,
   plugins: [
     payloadCloudPlugin(),

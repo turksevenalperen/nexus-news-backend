@@ -1,67 +1,142 @@
-# Payload Blank Template
+# Nexus News - Backend (Payload CMS)
 
-This template comes configured with the bare minimum to get started on anything you need.
+Bu proje Nexus News haber portalının backend kısmıdır. Payload CMS kullanılarak geliştirilmiştir.
 
-## Quick start
+## 🏗️ Proje Mimarisi
 
-This template can be deployed directly from our Cloud hosting and it will setup MongoDB and cloud S3 object storage for media.
+Bu backend aşağıdaki collection'ları içerir:
+- **Posts**: Haber yazıları (başlık, slug, yazar, kategori, içerik, SEO meta verileri)
+- **Categories**: Haber kategorileri (isim, slug)
+- **Authors**: Yazarlar (isim, avatar)
+- **SiteSettings**: Site genel ayarları (başlık, açıklama, tema rengi)
+- **Media**: Dosya yükleme ve yönetimi
+- **Users**: Admin kullanıcıları
 
-## Quick Start - local setup
+## 🚀 Kurulum
 
-To spin up this template locally, follow these steps:
+### Gereksinimler
+- Node.js 18+
+- MongoDB veritabanı
+- pnpm (önerilen) veya npm
 
-### Clone
+### Adım 1: Environment Dosyası Oluşturma
+```bash
+cp .env.example .env
+```
 
-After you click the `Deploy` button above, you'll want to have standalone copy of this repo on your machine. If you've already cloned this repo, skip to [Development](#development).
+`.env` dosyasını düzenleyin:
+```env
+DATABASE_URI=mongodb://127.0.0.1/nexus-news
+PAYLOAD_SECRET=your-secret-key-here
+```
 
-### Development
+### Adım 2: Bağımlılıkları Yükleme
+```bash
+pnpm install
+```
 
-1. First [clone the repo](#clone) if you have not done so already
-2. `cd my-project && cp .env.example .env` to copy the example environment variables. You'll need to add the `MONGODB_URI` from your Cloud project to your `.env` if you want to use S3 storage and the MongoDB database that was created for you.
+### Adım 3: Geliştirme Sunucusunu Başlatma
+```bash
+pnpm dev
+```
 
-3. `pnpm install && pnpm dev` to install dependencies and start the dev server
-4. open `http://localhost:3000` to open the app in your browser
+Uygulama http://localhost:3000 adresinde çalışacaktır.
 
-That's it! Changes made in `./src` will be reflected in your app. Follow the on-screen instructions to login and create your first admin user. Then check out [Production](#production) once you're ready to build and serve your app, and [Deployment](#deployment) when you're ready to go live.
+### Adım 4: İlk Admin Kullanıcısı Oluşturma
+1. Tarayıcıda http://localhost:3000/admin adresine gidin
+2. İlk admin kullanıcınızı oluşturun
+3. Admin panelinden içerik eklemeye başlayın
 
-#### Docker (Optional)
+## 📊 Veri Modelleri
 
-If you prefer to use Docker for local development instead of a local MongoDB instance, the provided docker-compose.yml file can be used.
+### Posts Collection
+- **title**: Haber başlığı (required)
+- **slug**: URL dostu slug (required, unique)  
+- **author**: Yazar referansı (required)
+- **category**: Kategori referansı (required)
+- **content**: Rich text içerik (required)
+- **publishedDate**: Yayın tarihi (required)
+- **featured**: Öne çıkan haber (boolean)
+- **meta**: SEO meta verileri (group)
+  - metaTitle: Meta başlık
+  - metaDescription: Meta açıklama
 
-To do so, follow these steps:
+### Categories Collection
+- **name**: Kategori adı (required)
+- **slug**: URL dostu slug (required, unique)
 
-- Modify the `MONGODB_URI` in your `.env` file to `mongodb://127.0.0.1/<dbname>`
-- Modify the `docker-compose.yml` file's `MONGODB_URI` to match the above `<dbname>`
-- Run `docker-compose up` to start the database, optionally pass `-d` to run in the background.
+### Authors Collection  
+- **name**: Yazar adı (required)
+- **avatar**: Profil fotoğrafı (upload)
 
-## How it works
+### SiteSettings Global
+- **siteTitle**: Site başlığı (required)
+- **description**: Site açıklaması
+- **themeColor**: Tema rengi
 
-The Payload config is tailored specifically to the needs of most websites. It is pre-configured in the following ways:
+## 🐳 Docker ile Çalıştırma (Opsiyonel)
 
-### Collections
+Yerel MongoDB kurulumu yerine Docker kullanmayı tercih ediyorsanız:
 
-See the [Collections](https://payloadcms.com/docs/configuration/collections) docs for details on how to extend this functionality.
+### Adım 1: Environment Dosyasını Düzenleyin
+```env
+DATABASE_URI=mongodb://127.0.0.1/nexus-news
+```
 
-- #### Users (Authentication)
+### Adım 2: Docker Compose'u Başlatın
+```bash
+docker-compose up -d
+```
 
-  Users are auth-enabled collections that have access to the admin panel.
+### Adım 3: Uygulamayı Başlatın
+```bash
+pnpm dev
+```
 
-  For additional help, see the official [Auth Example](https://github.com/payloadcms/payload/tree/main/examples/auth) or the [Authentication](https://payloadcms.com/docs/authentication/overview#authentication-overview) docs.
+## 📁 Proje Yapısı
 
-- #### Media
+```
+nexus-news-backend/
+├── src/
+│   ├── collections/          # Payload collection tanımları
+│   │   ├── Posts.ts         # Haber yazıları
+│   │   ├── Categories.ts    # Kategoriler
+│   │   ├── Authors.ts       # Yazarlar
+│   │   ├── Media.ts         # Medya dosyaları
+│   │   ├── Users.ts         # Kullanıcılar
+│   │   └── Globals.ts       # Site ayarları
+│   ├── app/                 # Next.js app directory
+│   └── payload.config.ts    # Payload CMS konfigürasyonu
+├── docker-compose.yml       # MongoDB Docker konfigürasyonu
+└── package.json
+```
 
-  This is the uploads enabled collection. It features pre-configured sizes, focal point and manual resizing to help you manage your pictures.
+## 🌐 API Endpoints
 
-### Docker
+Backend çalıştığında aşağıdaki API endpoint'leri kullanılabilir:
 
-Alternatively, you can use [Docker](https://www.docker.com) to spin up this template locally. To do so, follow these steps:
+- `GET /api/posts` - Tüm haberleri listele
+- `GET /api/posts?where[slug][equals]=slug-name` - Slug ile haber getir
+- `GET /api/categories` - Tüm kategorileri listele
+- `GET /api/authors` - Tüm yazarları listele
+- `GET /api/site-settings` - Site ayarlarını getir
+- `GET /api/media` - Medya dosyalarını listele
 
-1. Follow [steps 1 and 2 from above](#development), the docker-compose file will automatically use the `.env` file in your project root
-1. Next run `docker-compose up`
-1. Follow [steps 4 and 5 from above](#development) to login and create your first admin user
+## 🔧 Production Build
 
-That's it! The Docker instance will help you get up and running quickly while also standardizing the development environment across your teams.
+```bash
+pnpm build
+pnpm start
+```
 
-## Questions
+## 📞 Destek
 
-If you have any issues or questions, reach out to us on [Discord](https://discord.com/invite/payload) or start a [GitHub discussion](https://github.com/payloadcms/payload/discussions).
+Herhangi bir sorunla karşılaştığınızda:
+- [Payload CMS Dokümantasyonu](https://payloadcms.com/docs)
+- [GitHub Issues](https://github.com/payloadcms/payload/issues)
+
+## 🏷️ Versiyon
+
+- Payload CMS: 3.48.0
+- Next.js: 15.3.2
+- MongoDB: 5.0+
