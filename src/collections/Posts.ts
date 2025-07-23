@@ -1,3 +1,5 @@
+// Posts Collection - Haber yazıları veri modeli
+
 import { CollectionConfig } from 'payload'
 
 const Posts: CollectionConfig = {
